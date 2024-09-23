@@ -1,6 +1,8 @@
 
 # TsogoSun Points Calculator
 
-Turnover: [ \text{Turnover} = \text{Time played} \times \text{Average bet} \times \text{Decisions per hour} ]
-Theoretical win: [ \text{Theoretical win} = \text{Turnover} \times \text{Table hold} ]
-Points earned: [ \text{Points earned} = \text{Theoretical win} \times 0.02 ]
+Time played x Average bet x Decisions per hour = Turnover
+Turnover x Table hold = Theoretical win
+Points earned = Theoretical win x 2%
+
+Use calculator at: https://veergosai.github.io/TsogoSun-Points-Calculator/
