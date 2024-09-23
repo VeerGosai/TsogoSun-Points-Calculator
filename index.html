@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casino Points Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            flex-direction: column;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 600px; /* Set fixed width for both sections */
+        }
+        .calculator-section, .explanation-section {
+            margin: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%; /* Make sections take full width of the container */
+        }
+        h1, h2 {
+            text-align: center;
+            color: #b49a6a; /* Gold color */
+        }
+        label, input, select {
+            display: block;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 22px);
+        }
+        button {
+            background-color: #b49a6a; /* Gold color */
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #e4c8a1; /* Lighter gold on hover */
+        }
+        .math-formula {
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator-section">
+            <h1>Casino Points Calculator</h1>
+            <form id="casino-calculator">
+                <label for="timePlayed">Time Played (minutes):</label>
+                <input type="number" id="timePlayed" required>
+
+                <label for="avgBet">Average Bet:</label>
+                <input type="number" id="avgBet" required>
+
+                <label for="decisionsPerHour">Decisions Per Hour:</label>
+                <input type="number" id="decisionsPerHour" required>
+
+                <label for="game">Game:</label>
+                <select id="game" onchange="updateTableHold()">
+                    <option value="roulette">Roulette</option>
+                    <option value="blackjack">Blackjack</option>
+                    <option value="baccarat">Baccarat</option>
+                </select>
+
+                <input type="hidden" id="tableHold" value="2.70">
+
+                <button type="button" onclick="calculatePoints()">Calculate Points</button>
+            </form>
+
+            <h2>Points Earned: <span id="pointsEarned">0</span></h2>
+        </div>
+
+        <div class="explanation-section">
+            <h2>House Edge Calculation</h2>
+            <div id="houseEdgeExplanation" class="math-formula">
+                <!-- Edge calculation will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Veer Gosai</p>
+    </footer>
+
+    <script>
+        // Function to update table hold and show the math explanation
+        function updateTableHold() {
+            const game = document.getElementById('game').value;
+            let tableHold;
+            let explanation;
+
+            switch (game) {
+                case 'roulette':
+                    tableHold = 2.70;
+                    explanation = `Roulette (Single 0)\\n\\(\\text{House Edge} = \\left(\\frac{37 - 36}{37}\\right) \\times 100 = \\frac{1}{37} \\times 100 = 2.70\\%\\)`;
+                    break;
+                case 'blackjack':
+                    tableHold = 0.50;
+                    explanation = `
+Blackjack House Edge Calculation:
+
+In a typical Blackjack game with the following rules:
+- Blackjack pays 3:2
+- The dealer must hit on a soft 17
+- The second dealer card is only pulled after all players have acted
+- Aces can only be split once
+- The game uses a 6-deck Continuous Shuffling Machine (CSM)
+
+Let \\( P_B \\) be the probability of a player winning with Blackjack, \\( P_S \\) the probability of winning without Blackjack, and \\( P_L \\) the probability of losing.
+
+The expected payout for a player is given by:
+\\[
+E = P_B \\cdot \\frac{3}{2} + P_S \\cdot 1 - P_L \\cdot 1
+\\]
+
+Assuming the typical probabilities in a 6-deck game:
+- \\( P_B \\approx 0.048 \\)
+- \\( P_S \\approx 0.418 \\)
+- \\( P_L \\approx 0.494 \\)
+
+Substituting these values:
+\\[
+E = 0.048 \\cdot \\frac{3}{2} + 0.418 \\cdot 1 - 0.494 \\cdot 1
+\\]
+\\[
+E = 0.072 + 0.418 - 0.494
+\\]
+\\[
+E \\approx -0.004 \\text{ (or -0.4\\%)}
+\\]
+
+Thus, the house edge for this variant of Blackjack is approximately \\( 0.4\\% \\).
+                    `;
+                    break;
+                case 'baccarat':
+                    tableHold = 1.06;
+                    explanation = `
+Baccarat House Edge Calculation:
+
+For Baccarat with the rule that when the Banker wins with only a 6, the Banker only pays half the initial bet, we can define:
+
+Let \\( P_B \\), \\( P_P \\), and \\( P_T \\) be the probabilities of winning, pushing, and losing, respectively.
+
+The expected payout for the Banker is given by:
+\\[
+E = P_B \\cdot (1 - 0.05) + P_P \\cdot 0 + P_T \\cdot (-1)
+\\]
+
+Assuming typical probabilities in Baccarat:
+- \\( P_B \\approx 0.458 \\)
+- \\( P_P \\approx 0.095 \\)
+- \\( P_T \\approx 0.447 \\)
+
+Calculating:
+\\[
+E = P_B \\cdot 0.95 + P_T \\cdot (-1)
+\\]
+\\[
+E = 0.458 \\cdot 0.95 - 0.447
+\\]
+\\[
+E \\approx 0.435 - 0.447 \\approx -0.012 \\text{ (or -1.2\\%)}
+\\]
+
+Thus, the house edge for this version of Baccarat is approximately \\( 1.2\\% \\).
+                    `;
+                    break;
+            }
+
+            // Set the table hold value
+            document.getElementById('tableHold').value = tableHold;
+
+            // Show the house edge explanation
+            document.getElementById('houseEdgeExplanation').innerHTML = explanation;
+
+            // Re-render the math symbols using MathJax
+            MathJax.typeset();
+        }
+
+        // Function to calculate points
+        function calculatePoints() {
+            const timePlayed = parseFloat(document.getElementById('timePlayed').value) / 60; // Convert minutes to hours
+            const avgBet = parseFloat(document.getElementById('avgBet').value);
+            const decisionsPerHour = parseFloat(document.getElementById('decisionsPerHour').value);
+            const tableHold = parseFloat(document.getElementById('tableHold').value) / 100;
+
+            // Calculations
+            const turnover = timePlayed * avgBet * decisionsPerHour;
+            const theoreticalWin = turnover * tableHold;
+            const pointsEarned = theoreticalWin * 0.02;
+
+            // Update points earned
+            document.getElementById('pointsEarned').textContent = pointsEarned.toFixed(2);
+        }
+
+        // Initialize with default game (Roulette)
+        updateTableHold();
+    </script>
+</body>
+</html>
